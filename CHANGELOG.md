@@ -12,6 +12,10 @@ All notable changes to OpenRigGraph are documented here.
 - Added automated aim operator tests.
 - Added a GitHub Actions workflow that runs the FK and aim test suites on
   pushes and pull requests.
+- Added world-space evaluation of semantic aim constraints.
+- Added explicit rotation composition for parent/local rotation workflows.
+- Added Ruff as a development dependency and required CI linting.
+- Clarified NumPy array and scalar types in aim evaluation.
 
 ## [0.1.0] - 2026-09-22
 
