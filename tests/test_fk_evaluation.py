@@ -200,6 +200,26 @@ class TestFkEvaluation(unittest.TestCase):
                 entity_id='end',
                 entities=entities
             )
+            
+    def test_unknown_entity_raises_key_error(self):
+        
+        entities = {
+            'root': Entity(
+                id='root',
+                parent_id=None,
+                local_transform=Transform()
+            )
+        }
+        
+        with self.assertRaisesRegex(
+            KeyError,
+            'Unknown entity'
+        ):
+            
+            evaluate_world_transform(
+                entity_id='missing',
+                entities=entities
+            )
 
         
 if __name__ == '__main__':
