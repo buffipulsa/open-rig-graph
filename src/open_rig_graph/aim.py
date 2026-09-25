@@ -67,7 +67,7 @@ def apply_aim_rotation(
 
 def _quaternion_from_basis(
     basis: np.ndarray
-) -> typle[float, float, float, float]:
+) -> tuple[float, float, float, float]:
     
     matrix00 = basis[0, 0]
     matrix01 = basis[0, 1]
@@ -92,7 +92,7 @@ def _quaternion_from_basis(
     elif matrix00 > matrix11 and matrix00 > matrix22:
         scale = np.sqrt(1.0 + matrix00 - matrix11 - matrix22) * 2.0
         quaternion = (
-            0.25 * scale
+            0.25 * scale,
             (matrix01 + matrix10) / scale,
             (matrix02 + matrix20) / scale,
             (matrix21 - matrix12) / scale,
