@@ -264,6 +264,35 @@ class TestFkEvaluation(unittest.TestCase):
         self.assertAlmostEqual(
             world_transform.rotation[3], 0.0
         )
+        
+    def test_local_scale_composes_with_parent_scale(self):
+        
+        entities = {
+            'root': Entity(
+                id='root',
+                parent_id=None,
+                local_transform=Transform(
+                    scale=(2.0,3.0,4.0)
+                )
+            ),
+            'mid': Entity(
+                id='mid',
+                parent_id='root',
+                local_transform=Transform(
+                    scale=(0.5,2.0,1.5)
+                )
+            )
+        }
+        
+        world_transform = evaluate_world_transform(
+            entity_id='mid',
+            entities=entities
+        )
+        
+        self.assertEqual(
+            world_transform.scale,
+            (1.0,6.0,6.0)
+        )
 
         
 if __name__ == '__main__':
