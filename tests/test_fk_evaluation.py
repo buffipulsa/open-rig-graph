@@ -152,6 +152,35 @@ class TestFkEvaluation(unittest.TestCase):
             world_transform.scale,
             (2.0,3.0,1.0)
         )
+        
+    def test_hierarchy_cycle_raises_value_error(self):
+        
+        cyclic_entities = {
+            'root': Entity(
+                id='root',
+                parent_id='end',
+                local_transform=Transform()
+            ),
+            'mid': Entity(
+                id='mid',
+                parent_id='root',
+                local_transform=Transform()
+            ),
+            'end': Entity(
+                id='end',
+                parent_id='mid',
+                local_transform=Transform()
+            )
+        }
+        
+        with self.assertRaisesRegex(
+            ValueError,
+            'Hierarchy cycle detected'
+        ):
+            evaluate_world_transform(
+                entity_id='end', 
+                entities=cyclic_entities
+            )
 
         
 if __name__ == '__main__':
