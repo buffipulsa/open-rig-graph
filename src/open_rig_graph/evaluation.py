@@ -16,3 +16,12 @@ def evaluate_world_transform(
     parent_world = evaluate_world_transform(entity.parent_id, entities)
     
     return compose_transform(parent_world, entity.local_transform)
+
+def evaluate_world_transforms(
+    entities: dict[str, Entity]
+) -> dict[str, Transform]:
+    
+    return {
+        entity_id: evaluate_world_transform(entity_id, entities)
+        for entity_id in entities
+    }
