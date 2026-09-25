@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.2"
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install project
+        run: uv sync --locked
+
+      - name: Run FK tests
+        run: uv run python tests/test_fk_evaluation.py
+
+      - name: Run aim tests
+        run: uv run python tests/test_aim.py
