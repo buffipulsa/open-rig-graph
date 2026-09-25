@@ -119,6 +119,39 @@ class TestFkEvaluation(unittest.TestCase):
         self.assertAlmostEqual(
             world_transform.translation[2], 0.0
         )
+        
+    def test_parent_scale_affects_child_translation_and_scale(self):
+        
+        entities = {
+            'root': Entity(
+                id='root',
+                parent_id=None,
+                local_transform=Transform(
+                    scale=(2.0,3.0,1.0)
+                )
+            ),
+            'mid': Entity(
+                id='mid',
+                parent_id='root',
+                local_transform=Transform(
+                    translation=(1.0,1.0,1.0)
+                )
+            )
+        }
+        
+        world_transform = evaluate_world_transform(
+            entity_id='mid',
+            entities=entities
+        )
+        
+        self.assertEqual(
+            world_transform.translation,
+            (2.0,3.0,1.0)
+        )
+        self.assertEqual(
+            world_transform.scale,
+            (2.0,3.0,1.0)
+        )
 
         
 if __name__ == '__main__':
