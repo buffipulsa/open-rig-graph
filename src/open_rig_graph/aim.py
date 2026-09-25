@@ -1,5 +1,6 @@
 
 import numpy as np
+from numpy.typing import NDArray
 
 from .constraints import AimConstraint
 from .transform import Transform
@@ -11,9 +12,18 @@ def compute_aim_rotation(
     up_direction: tuple[float, float, float]
 ) -> tuple[float, float, float, float]:
     
-    source = np.asarray(source_position, dtype=float)
-    target = np.asarray(target_position, dtype=float)
-    up = np.asarray(up_direction, dtype=float)
+    source: NDArray[np.float64] = np.asarray(
+        source_position,
+        dtype=float
+    )
+    target: NDArray[np.float64] = np.asarray(
+        target_position,
+        dtype=float
+    )
+    up: NDArray[np.float64] = np.asarray(
+        up_direction,
+        dtype=float
+    )
     
     aim = target - source
     aim_length = np.linalg.norm(aim)
@@ -25,7 +35,7 @@ def compute_aim_rotation(
         
     aim /= aim_length
     
-    up_length = np.linalg.norm(up)
+    up_length: float = np.linalg.norm(up)
     
     if np.isclose(up_length, 0.0):
         raise ValueError(
@@ -34,7 +44,8 @@ def compute_aim_rotation(
     
     up /= up_length
     
-    projected_up = up - np.dot(up, aim) * aim
+    alignment: float = float(np.dot(up, aim))
+    projected_up: NDArray[np.float64] = up - alignment * aim
     projected_up_length = np.linalg.norm(projected_up)
     
     if np.isclose(projected_up_length, 0.0):
@@ -45,7 +56,9 @@ def compute_aim_rotation(
     y_axis = projected_up / projected_up_length
     z_axis = np.cross(aim, y_axis)
     
-    basis = np.column_stack((aim, y_axis, z_axis))
+    basis: NDArray[np.float64] = np.column_stack(
+        (aim, y_axis, z_axis)
+    )
     
     return _quaternion_from_basis(basis=basis)
 
@@ -53,7 +66,7 @@ def apply_aim_rotation(
     transform: Transform,
     target_position: tuple[float, float, float],
     up_direction: tuple[float, float, float]
-):
+) -> Transform:
     
     rotation = compute_aim_rotation(
         source_position=transform.translation,
@@ -93,7 +106,7 @@ def evaluate_aim_constraints(
     )
 
 def _quaternion_from_basis(
-    basis: np.ndarray
+    basis: NDArray[np.float64]
 ) -> tuple[float, float, float, float]:
     
     matrix00 = basis[0, 0]
@@ -141,7 +154,12 @@ def _quaternion_from_basis(
             (matrix10 - matrix01) / scale
         )
         
-    return tuple(float(component) for component in quaternion)
+    return (
+        float(quaternion[0]),
+        float(quaternion[1]),
+        float(quaternion[2]),
+        float(quaternion[3]),
+    )
 
 
 
