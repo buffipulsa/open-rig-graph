@@ -1,7 +1,8 @@
 
 import unittest
 
-from open_rig_graph.aim import compute_aim_rotation
+from open_rig_graph.aim import apply_aim_rotation, compute_aim_rotation
+from open_rig_graph.transform import Transform
 
 
 class TestAim(unittest.TestCase):
@@ -52,6 +53,24 @@ class TestAim(unittest.TestCase):
                 target_position=(1.0,0.0,0.0),
                 up_direction=(1.0,0.0,0.0),
             )
+            
+    def test_apply_aim_rotation_preserves_translation_and_scale(self):
+        
+        transform = Transform(
+            translation=(2.0,3.0,4.0),
+            scale=(2.0,3.0,4.0)
+        )
+        
+        result = apply_aim_rotation(
+            transform=transform,
+            target_position=(2.0,4.0,4.0),
+            up_direction=(0.0,0.0,1.0)
+        )
+        
+        self.assertEqual(result.translation, transform.translation)
+        self.assertEqual(result.scale, transform.scale)
+        self.assertNotEqual(result.rotation, transform.rotation)
+
         
 if __name__ == '__main__':
     

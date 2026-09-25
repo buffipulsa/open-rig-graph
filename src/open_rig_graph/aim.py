@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from .transform import Transform
+
 def compute_aim_rotation(
     source_position: tuple[float, float, float],
     target_position: tuple[float, float, float],
@@ -44,6 +46,24 @@ def compute_aim_rotation(
     basis = np.column_stack((aim, y_axis, z_axis))
     
     return _quaternion_from_basis(basis=basis)
+
+def apply_aim_rotation(
+    transform: Transform,
+    target_position: tuple[float, float, float],
+    up_direction: tuple[float, float, float]
+):
+    
+    rotation = compute_aim_rotation(
+        source_position=transform.translation,
+        target_position=target_position,
+        up_direction=up_direction
+    )
+    
+    return Transform(
+        translation=transform.translation,
+        rotation=rotation,
+        scale=transform.scale
+    )
 
 def _quaternion_from_basis(
     basis: np.ndarray
