@@ -293,6 +293,51 @@ class TestFkEvaluation(unittest.TestCase):
             world_transform.scale,
             (1.0,6.0,6.0)
         )
+        
+    def test_evaluation_is_independent_of_entity_insertion_order(self):
+        
+        root = Entity(
+            id='root',
+            parent_id=None,
+            local_transform=Transform(
+                translation=(10.0,0.0,0.0)
+            )
+        )
+        mid = Entity(
+            id='mid',
+            parent_id='root',
+            local_transform=Transform(
+                translation=(2.0,0.0,0.0)
+            )
+        )
+        end = Entity(
+            id='end',
+            parent_id='mid',
+            local_transform=Transform(
+                translation=(3.0,0.0,0.0)
+            )
+        )
+        
+        entities_forward = {
+            'root': root,
+            'mid': mid,
+            'end': end
+        }
+        
+        entities_reverse = {
+            'end': end,
+            'mid': mid,
+            'root': root
+        }
+        
+        forward_results = evaluate_world_transforms(entities_forward)
+        reverse_results = evaluate_world_transforms(entities_reverse)
+        
+        for entity_id in entities_forward:
+            self.assertEqual(
+                forward_results[entity_id],
+                reverse_results[entity_id]
+            )
 
         
 if __name__ == '__main__':
