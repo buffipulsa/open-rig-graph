@@ -220,6 +220,50 @@ class TestFkEvaluation(unittest.TestCase):
                 entity_id='missing',
                 entities=entities
             )
+            
+    def test_local_rotation_composes_with_parent_rotation(self):
+        
+        quarter_turn_z = (
+            0.0,
+            0.0,
+            0.70710678118,
+            0.70710678118,
+        )
+        
+        entities = {
+            'root': Entity(
+                id='root',
+                parent_id=None,
+                local_transform=Transform(
+                    rotation=quarter_turn_z
+                )
+            ),
+            'mid': Entity(
+                id='mid',
+                parent_id='root',
+                local_transform=Transform(
+                    rotation=quarter_turn_z
+                )
+            )
+        }
+        
+        world_transform = evaluate_world_transform(
+            entity_id='mid',
+            entities=entities
+        )
+        
+        self.assertAlmostEqual(
+            world_transform.rotation[0], 0.0
+        )
+        self.assertAlmostEqual(
+            world_transform.rotation[1], 0.0
+        )
+        self.assertAlmostEqual(
+            world_transform.rotation[2], 1.0
+        )
+        self.assertAlmostEqual(
+            world_transform.rotation[3], 0.0
+        )
 
         
 if __name__ == '__main__':
