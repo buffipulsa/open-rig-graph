@@ -111,6 +111,48 @@ class TestAim(unittest.TestCase):
             self.assertAlmostEqual(
                 actual_value, expected_value
             )
+            
+    def test_missing_driven_entity_raises_key_error(self):
+        
+        constraint = AimConstraint(
+            driven_id='missing',
+            target_id='target'
+        )
+        
+        world_transforms = {
+            'target': Transform(
+                translation=(1.0,0.0,0.0)
+            )
+        }
+        
+        with self.assertRaisesRegex(
+            KeyError,
+            "Unknown driven entity"
+        ):
+            evaluate_aim_constraints(
+                constraint=constraint,
+                world_transforms=world_transforms
+            )
+            
+    def test_missing_target_entity_raises_key_error(self):
+        
+        constraint = AimConstraint(
+            driven_id='driven',
+            target_id='missing'
+        )
+        
+        world_transforms = {
+            'driven': Transform()
+        }
+        
+        with self.assertRaisesRegex(
+            KeyError,
+            "Unknown target entity"
+        ):
+            evaluate_aim_constraints(
+                constraint=constraint,
+                world_transforms=world_transforms
+            )
 
         
 if __name__ == '__main__':
