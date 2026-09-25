@@ -79,5 +79,47 @@ class TestFkEvaluation(unittest.TestCase):
             (15.0,0.0,0.0)
         )
         
+    def test_parent_rotation_rotates_child_translation(self):
+        
+        quarter_turn_z = (
+            0.0,
+            0.0,
+            0.70710678118,
+            0.70710678118,
+        )
+        
+        entities = {
+            'root': Entity(
+                id='root',
+                parent_id=None,
+                local_transform=Transform(
+                    rotation=quarter_turn_z
+                )
+            ),
+            'mid': Entity(
+                id='mid',
+                parent_id='root',
+                local_transform=Transform(
+                    translation=(2.0,0.0,0.0)
+                )
+            )
+        }
+        
+        world_transform = evaluate_world_transform(
+            entity_id='mid',
+            entities=entities
+        )
+        
+        self.assertAlmostEqual(
+            world_transform.translation[0], 0.0
+        )
+        self.assertAlmostEqual(
+            world_transform.translation[1], 2.0
+        )
+        self.assertAlmostEqual(
+            world_transform.translation[2], 0.0
+        )
+
+        
 if __name__ == '__main__':
     unittest.main(verbosity=2)
