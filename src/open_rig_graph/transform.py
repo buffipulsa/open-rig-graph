@@ -25,7 +25,17 @@ class Transform:
     translation: tuple[float, float, float] = (0.0,0.0,0.0)
     rotation: tuple[float, float, float, float] = (0.0,0.0,0.0,1.0)
     scale: tuple[float, float, float] = (1.0,1.0,1.0)
+
+def compose_rotation(
+    parent_rotation: tuple[float, float, float, float],
+    local_rotation: tuple[float, float, float, float]
+) -> tuple[float, float, float, float]:
     
+    return _quaternion_multiply(
+        parent_rotation,
+        local_rotation
+    )
+
 def compose_transform(
     parent: Transform,
     local: Transform,
@@ -53,9 +63,10 @@ def compose_transform(
     parent_scale = parent.scale
     local_translation = local.translation
     
-    scaled_translation = tuple(
-        parent_scale[index] * local_translation[index]
-        for index in range(3)
+    scaled_translation = (
+        parent_scale[0] * local_translation[0],
+        parent_scale[1] * local_translation[1],
+        parent_scale[2] * local_translation[2],
     )
     
     rotated_translation = _rotate_vector(
@@ -63,19 +74,21 @@ def compose_transform(
         scaled_translation,
     )
     
-    world_translation = tuple(
-        parent.translation[index] + rotated_translation[index]
-        for index in range(3)
+    world_translation = (
+        parent.translation[0] + rotated_translation[0],
+        parent.translation[1] + rotated_translation[1],
+        parent.translation[2] + rotated_translation[2],
     )
     
-    world_rotation = _quaternion_multiply(
+    world_rotation = compose_rotation(
         parent.rotation,
         local.rotation
     )
     
-    world_scale = tuple(
-        parent.scale[index] * local.scale[index]
-        for index in range(3)
+    world_scale = (
+        parent.scale[0] * local.scale[0],
+        parent.scale[1] * local.scale[1],
+        parent.scale[2] * local.scale[2],
     )
     
     return Transform(
