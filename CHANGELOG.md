@@ -2,6 +2,17 @@
 
 All notable changes to OpenRigGraph are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Added NumPy as a runtime dependency for numerical rig evaluation.
+- Added a NumPy-based aim rotation operator with validation for undefined aim
+  directions.
+- Added automated aim operator tests.
+- Added a GitHub Actions workflow that runs the FK and aim test suites on
+  pushes and pull requests.
+
 ## [0.1.0] - 2026-09-22
 
 ### Added
