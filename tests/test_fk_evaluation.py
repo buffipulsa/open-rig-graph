@@ -181,6 +181,25 @@ class TestFkEvaluation(unittest.TestCase):
                 entity_id='end', 
                 entities=cyclic_entities
             )
+            
+    def test_missing_parent_raises_key_error(self):
+        
+        entities = {
+            'end': Entity(
+                id='end',
+                parent_id='missing',
+                local_transform=Transform()
+            )
+        }
+        
+        with self.assertRaisesRegex(
+            KeyError,
+            'references missing parent'
+        ):
+            evaluate_world_transform(
+                entity_id='end',
+                entities=entities
+            )
 
         
 if __name__ == '__main__':
