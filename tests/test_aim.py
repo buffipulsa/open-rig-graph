@@ -1,7 +1,12 @@
 
 import unittest
 
-from open_rig_graph.aim import apply_aim_rotation, compute_aim_rotation
+from open_rig_graph.aim import (
+    apply_aim_rotation,
+    compute_aim_rotation,
+    evaluate_aim_constraints,
+)
+from open_rig_graph.constraints import AimConstraint
 from open_rig_graph.transform import Transform
 
 
@@ -70,6 +75,42 @@ class TestAim(unittest.TestCase):
         self.assertEqual(result.translation, transform.translation)
         self.assertEqual(result.scale, transform.scale)
         self.assertNotEqual(result.rotation, transform.rotation)
+
+    def test_evaluate_aim_constraint_returns_constrained_world_transform(self):
+        
+        world_transforms = {
+            'driven': Transform(
+                translation=(2.0,3.0,4.0),
+                scale=(2.0,3.0,4.0)
+            ),
+            'target': Transform(
+                translation=(2.0,4.0,4.0)
+            )
+        }
+
+        constraint = AimConstraint(
+            driven_id='driven',
+            target_id='target',
+            up_direction=(0.0,0.0,1.0)
+        )
+        
+        result = evaluate_aim_constraints(
+            constraint=constraint,
+            world_transforms=world_transforms
+        )
+        
+        self.assertEqual(result.translation, (2.0,3.0,4.0))
+        self.assertEqual(result.scale, (2.0,3.0,4.0))
+        
+        expected_rotation = (0.5,0.5,0.5,0.5)
+        
+        for actual_value, expected_value in zip(
+            result.rotation,
+            expected_rotation
+        ):
+            self.assertAlmostEqual(
+                actual_value, expected_value
+            )
 
         
 if __name__ == '__main__':

@@ -1,7 +1,9 @@
 
 import numpy as np
 
+from .constraints import AimConstraint
 from .transform import Transform
+
 
 def compute_aim_rotation(
     source_position: tuple[float, float, float],
@@ -65,6 +67,31 @@ def apply_aim_rotation(
         scale=transform.scale
     )
 
+def evaluate_aim_constraints(
+    constraint: AimConstraint,
+    world_transforms: dict[str, Transform]
+) -> Transform:
+    
+    try:
+        driven_transform = world_transforms[constraint.driven_id]
+    except KeyError as error:
+        raise KeyError(
+            f'Unknown driven entity {constraint.driven_id!r}.'
+        ) from error
+        
+    try:
+        target_transform = world_transforms[constraint.target_id]
+    except KeyError as error:
+        raise KeyError(
+            f'Unknown target entity {constraint.target_id!r}.'
+        ) from error
+
+    return apply_aim_rotation(
+        transform=driven_transform,
+        target_position=target_transform.translation,
+        up_direction=constraint.up_direction
+    )
+
 def _quaternion_from_basis(
     basis: np.ndarray
 ) -> tuple[float, float, float, float]:
@@ -115,3 +142,6 @@ def _quaternion_from_basis(
         )
         
     return tuple(float(component) for component in quaternion)
+
+
+
