@@ -1,2 +1,1 @@
-def hello() -> str:
-    return "Hello from open-rig-graph!"
+"""Application-independent procedural rig representation and evaluation."""
