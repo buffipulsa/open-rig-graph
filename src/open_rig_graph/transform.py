@@ -96,7 +96,15 @@ def compose_transform(
         rotation=world_rotation,
         scale=world_scale
     )
+
+def inverse_rotation(
+    rotation: tuple[float, float, float, float]
+) -> tuple[float, float, float, float]:
     
+    x, y, z, w = rotation
+    
+    return (-x, -y, -z, w)
+
 def _quaternion_multiply(
     first: tuple[float, float, float, float],
     second: tuple[float, float, float, float]
