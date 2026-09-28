@@ -105,6 +105,18 @@ def inverse_rotation(
     
     return (-x, -y, -z, w)
 
+def to_local_rotation(
+    parent_rotation: tuple[float, float, float, float],
+    world_rotation: tuple[float, float, float, float]
+) -> tuple[float, float, float, float]:
+    
+    return compose_rotation(
+        parent_rotation=inverse_rotation(
+            rotation=parent_rotation
+        ),
+        local_rotation=world_rotation
+    )
+
 def _quaternion_multiply(
     first: tuple[float, float, float, float],
     second: tuple[float, float, float, float]
