@@ -16,6 +16,11 @@ All notable changes to OpenRigGraph are documented here.
 - Added explicit rotation composition for parent/local rotation workflows.
 - Added Ruff as a development dependency and required CI linting.
 - Clarified NumPy array and scalar types in aim evaluation.
+- Added quaternion inversion and parent-local rotation conversion utilities.
+- Extended aim evaluation to convert constrained world rotations into local
+  parent space.
+- Added NumPy-style API documentation for transform, aim, and constraint
+  concepts.
 
 ## [0.1.0] - 2026-09-22
 
