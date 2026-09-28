@@ -30,6 +30,20 @@ def compose_rotation(
     parent_rotation: tuple[float, float, float, float],
     local_rotation: tuple[float, float, float, float]
 ) -> tuple[float, float, float, float]:
+    """Compose a local rotation with a parent rotation.
+
+    Parameters
+    ----------
+    parent_rotation : tuple[float, float, float, float]
+        Parent unit quaternion in ``(x, y, z, w)`` order.
+    local_rotation : tuple[float, float, float, float]
+        Local unit quaternion in ``(x, y, z, w)`` order.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        The composed unit quaternion in ``(x, y, z, w)`` order.
+    """
     
     return _quaternion_multiply(
         parent_rotation,
@@ -100,6 +114,18 @@ def compose_transform(
 def inverse_rotation(
     rotation: tuple[float, float, float, float]
 ) -> tuple[float, float, float, float]:
+    """Return the inverse of a unit quaternion.
+
+    Parameters
+    ----------
+    rotation : tuple[float, float, float, float]
+        Unit quaternion in ``(x, y, z, w)`` order.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        The inverse quaternion in ``(x, y, z, w)`` order.
+    """
     
     x, y, z, w = rotation
     
@@ -109,6 +135,20 @@ def to_local_rotation(
     parent_rotation: tuple[float, float, float, float],
     world_rotation: tuple[float, float, float, float]
 ) -> tuple[float, float, float, float]:
+    """Convert a world rotation into a parent's local rotation space.
+
+    Parameters
+    ----------
+    parent_rotation : tuple[float, float, float, float]
+        Parent unit quaternion in world space.
+    world_rotation : tuple[float, float, float, float]
+        Desired world-space unit quaternion.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        Equivalent local rotation in ``(x, y, z, w)`` order.
+    """
     
     return compose_rotation(
         parent_rotation=inverse_rotation(

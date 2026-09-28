@@ -1,4 +1,6 @@
 
+"""Pure aim-direction and aim-constraint evaluation."""
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -11,6 +13,28 @@ def compute_aim_rotation(
     target_position: tuple[float, float, float],
     up_direction: tuple[float, float, float]
 ) -> tuple[float, float, float, float]:
+    """Compute a rotation that aims the local +X axis at a target.
+
+    Parameters
+    ----------
+    source_position : tuple[float, float, float]
+        Position of the driven object.
+    target_position : tuple[float, float, float]
+        Position the driven object should aim toward.
+    up_direction : tuple[float, float, float]
+        Direction used to resolve the local +Y axis.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        A unit quaternion in ``(x, y, z, w)`` order.
+
+    Raises
+    ------
+    ValueError
+        If the source and target coincide, the up direction is zero-length,
+        or the up direction is parallel to the aim direction.
+    """
     
     source: NDArray[np.float64] = np.asarray(
         source_position,
@@ -67,6 +91,23 @@ def apply_aim_rotation(
     target_position: tuple[float, float, float],
     up_direction: tuple[float, float, float]
 ) -> Transform:
+    """Apply an aim rotation while preserving translation and scale.
+
+    Parameters
+    ----------
+    transform : Transform
+        Transform whose translation provides the source position.
+    target_position : tuple[float, float, float]
+        Position the transform should aim toward.
+    up_direction : tuple[float, float, float]
+        Direction used to resolve the driven orientation's up axis.
+
+    Returns
+    -------
+    Transform
+        A transform with the computed rotation and the original translation
+        and scale.
+    """
     
     rotation = compute_aim_rotation(
         source_position=transform.translation,
@@ -87,6 +128,27 @@ def apply_aim_rotation_in_parent_space(
     parent_world_rotation: tuple[float, float, float, float],
     up_direction: tuple[float, float, float]
 ) -> Transform:
+    """Apply a world-space aim and return the result in parent space.
+
+    Parameters
+    ----------
+    local_transform : Transform
+        Original transform authored relative to the parent.
+    source_world_position : tuple[float, float, float]
+        Driven position in world space.
+    target_world_position : tuple[float, float, float]
+        Target position in world space.
+    parent_world_rotation : tuple[float, float, float, float]
+        Parent's world-space rotation.
+    up_direction : tuple[float, float, float]
+        Direction used to resolve the driven orientation's up axis.
+
+    Returns
+    -------
+    Transform
+        A local transform with the constrained rotation and original
+        translation and scale.
+    """
     
     world_rotation = compute_aim_rotation(
         source_position=source_world_position,
@@ -109,6 +171,25 @@ def evaluate_aim_constraints(
     constraint: AimConstraint,
     world_transforms: dict[str, Transform]
 ) -> Transform:
+    """Evaluate one semantic aim constraint from world transforms.
+
+    Parameters
+    ----------
+    constraint : AimConstraint
+        Semantic relationship to evaluate.
+    world_transforms : dict[str, Transform]
+        Derived world transforms indexed by stable entity identity.
+
+    Returns
+    -------
+    Transform
+        The constrained driven world transform.
+
+    Raises
+    ------
+    KeyError
+        If the driven or target entity is absent from ``world_transforms``.
+    """
     
     try:
         driven_transform = world_transforms[constraint.driven_id]
@@ -133,6 +214,19 @@ def evaluate_aim_constraints(
 def _quaternion_from_basis(
     basis: NDArray[np.float64]
 ) -> tuple[float, float, float, float]:
+    """Convert an orthonormal basis matrix to a unit quaternion.
+
+    Parameters
+    ----------
+    basis : NDArray[np.float64]
+        Three-by-three rotation basis with the aim, up, and side axes as
+        columns.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        Unit quaternion in ``(x, y, z, w)`` order.
+    """
     
     matrix00 = basis[0, 0]
     matrix01 = basis[0, 1]
