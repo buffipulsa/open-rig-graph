@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .constraints import AimConstraint
-from .transform import Transform
+from .transform import Transform, to_local_rotation
 
 
 def compute_aim_rotation(
@@ -78,6 +78,31 @@ def apply_aim_rotation(
         translation=transform.translation,
         rotation=rotation,
         scale=transform.scale
+    )
+
+def apply_aim_rotation_in_parent_space(
+    local_transform: Transform,
+    source_world_position: tuple[float, float, float],
+    target_world_position: tuple[float, float, float],
+    parent_world_rotation: tuple[float, float, float, float],
+    up_direction: tuple[float, float, float]
+) -> Transform:
+    
+    world_rotation = compute_aim_rotation(
+        source_position=source_world_position,
+        target_position=target_world_position,
+        up_direction=up_direction
+    )
+    
+    local_rotation = to_local_rotation(
+        parent_rotation=parent_world_rotation,
+        world_rotation=world_rotation
+    )
+    
+    return Transform(
+        translation=local_transform.translation,
+        rotation=local_rotation,
+        scale=local_transform.scale
     )
 
 def evaluate_aim_constraints(

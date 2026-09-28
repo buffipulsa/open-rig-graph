@@ -3,6 +3,7 @@ import unittest
 
 from open_rig_graph.aim import (
     apply_aim_rotation,
+    apply_aim_rotation_in_parent_space,
     compute_aim_rotation,
     evaluate_aim_constraints,
 )
@@ -153,6 +154,32 @@ class TestAim(unittest.TestCase):
                 constraint=constraint,
                 world_transforms=world_transforms
             )
+
+    def test_aim_rotation_is_converted_to_parent_space(self):
+        
+        local_transform = Transform(
+            translation=(0.0,1.0,0.0),
+            scale=(2.0,2.0,2.0)
+        )
+        
+        result = apply_aim_rotation_in_parent_space(
+            local_transform=local_transform,
+            source_world_position=(1.0,2.0,3.0),
+            target_world_position=(1.0,3.0,3.0),
+            parent_world_rotation=(0.5,0.5,0.5,0.5),
+            up_direction=(0.0,0.0,1.0)
+        )
+        
+        self.assertEqual(result.translation, local_transform.translation)
+        self.assertEqual(result.scale, local_transform.scale)
+        
+        expected_local_rotation = (0.0,0.0,0.0,1.0)
+        
+        for actual_value, expected_value in zip(
+            result.rotation,
+            expected_local_rotation
+        ):
+            self.assertAlmostEqual(actual_value, expected_value)
 
         
 if __name__ == '__main__':
