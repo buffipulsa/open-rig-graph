@@ -5,9 +5,11 @@ from open_rig_graph.aim import (
     apply_aim_rotation,
     apply_aim_rotation_in_parent_space,
     compute_aim_rotation,
+    evaluate_aim_constraint_in_parent_space,
     evaluate_aim_constraints,
 )
 from open_rig_graph.constraints import AimConstraint
+from open_rig_graph.entity import Entity
 from open_rig_graph.transform import Transform
 
 
@@ -22,7 +24,7 @@ class TestAim(unittest.TestCase):
         )
         
         self.assertEqual(rotation, (0.0,0.0,0.0,1.0))
-        
+
     def test_aiming_along_y_returns_expected_rotation(self):
 
         rotation = compute_aim_rotation(
@@ -35,7 +37,7 @@ class TestAim(unittest.TestCase):
         
         for actual_value, expected_value in zip(rotation, expected):
             self.assertAlmostEqual(actual_value, expected_value)
-            
+
     def test_coincident_positions_rase_value_error(self):
         
         with self.assertRaisesRegex(
@@ -47,7 +49,7 @@ class TestAim(unittest.TestCase):
                 target_position=(0.0,0.0,0.0),
                 up_direction=(0.0,1.0,0.0),
             )
-            
+
     def test_parallel_up_direction_raises_value_error(self):
         
         with self.assertRaisesRegex(
@@ -59,7 +61,7 @@ class TestAim(unittest.TestCase):
                 target_position=(1.0,0.0,0.0),
                 up_direction=(1.0,0.0,0.0),
             )
-            
+
     def test_apply_aim_rotation_preserves_translation_and_scale(self):
         
         transform = Transform(
@@ -112,7 +114,7 @@ class TestAim(unittest.TestCase):
             self.assertAlmostEqual(
                 actual_value, expected_value
             )
-            
+
     def test_missing_driven_entity_raises_key_error(self):
         
         constraint = AimConstraint(
@@ -134,7 +136,7 @@ class TestAim(unittest.TestCase):
                 constraint=constraint,
                 world_transforms=world_transforms
             )
-            
+
     def test_missing_target_entity_raises_key_error(self):
         
         constraint = AimConstraint(
@@ -181,7 +183,68 @@ class TestAim(unittest.TestCase):
         ):
             self.assertAlmostEqual(actual_value, expected_value)
 
+    def test_entity_aim_constraint_returns_parent_space_transform(self):
         
+        parent_rotation = (0.5,0.5,0.5,0.5)
+        
+        entities = {
+            'parent': Entity(
+                id='parent',
+                parent_id=None,
+                local_transform=Transform(
+                    rotation=parent_rotation
+                )
+            ),
+            'driven': Entity(
+                id='driven',
+                parent_id='parent',
+                local_transform=Transform(
+                    translation=(0.0,1.0,0.0),
+                    scale=(2.0,2.0,2.0),
+                )
+            ),
+            'target': Entity(
+                id='target',
+                parent_id=None,
+                local_transform=Transform()
+            ),
+        }
+        
+        world_transforms = {
+            'parent': Transform(
+                rotation=parent_rotation
+            ),
+            'driven': Transform(
+                translation=(1.0,2.0,3.0)
+            ),
+            'target': Transform(
+                translation=(1.0,3.0,3.0)
+            )
+        }
+        
+        constraint = AimConstraint(
+            driven_id='driven',
+            target_id='target',
+            up_direction=(0.0,0.0,1.0)
+        )
+        
+        result = evaluate_aim_constraint_in_parent_space(
+            constraint=constraint,
+            entities=entities,
+            world_transforms=world_transforms
+        )
+        
+        self.assertEqual(result.translation, (0.0,1.0,0.0))
+        self.assertEqual(result.scale, (2.0,2.0,2.0))
+        
+        expected_local_rotation = (0.0,0.0,0.0,1.0)
+        
+        for actual_value, expected_value in zip(
+            result.rotation,
+            expected_local_rotation
+        ):
+            self.assertAlmostEqual(actual_value, expected_value)
+
 if __name__ == '__main__':
     
     unittest.main(verbosity=2)

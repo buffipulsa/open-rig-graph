@@ -6,6 +6,7 @@ from numpy.typing import NDArray
 
 from .constraints import AimConstraint
 from .transform import Transform, to_local_rotation
+from .entity import Entity
 
 
 def compute_aim_rotation(
@@ -165,6 +166,55 @@ def apply_aim_rotation_in_parent_space(
         translation=local_transform.translation,
         rotation=local_rotation,
         scale=local_transform.scale
+    )
+
+def evaluate_aim_constraint_in_parent_space(
+    constraint: AimConstraint,
+    entities: dict[str, Entity],
+    world_transforms: dict[str, Transform]
+) -> Transform:
+    
+    try:
+        driven_entity = entities[constraint.driven_id]
+    except KeyError as error:
+        raise KeyError(
+            f'Unknown driven entity {constraint.driven_id!r}.'
+        ) from error
+        
+    try:
+        driven_world = world_transforms[constraint.driven_id]
+    except KeyError as error:
+        raise KeyError(
+            'Missing world transform for driven entity '
+            f'{constraint.driven_id!r}.'
+        ) from error
+        
+    try:
+        target_world = world_transforms[constraint.target_id]
+    except KeyError as error:
+        raise KeyError(
+            f'Unknown target entity {constraint.target_id!r}.'
+        ) from error
+        
+    if driven_entity.parent_id is None:
+        parent_world_rotation = (0.0,0.0,0.0,1.0)
+    else:
+        try:
+            parent_world_rotation = world_transforms[
+                driven_entity.parent_id
+            ].rotation
+        except KeyError as error:
+            raise KeyError(
+                'Missing world transform for parent '
+                f'{driven_entity.parent_id!r}.'
+            ) from error
+            
+    return apply_aim_rotation_in_parent_space(
+        local_transform=driven_entity.local_transform,
+        source_world_position=driven_world.translation,
+        target_world_position=target_world.translation,
+        parent_world_rotation=parent_world_rotation,
+        up_direction=constraint.up_direction
     )
 
 def evaluate_aim_constraints(
