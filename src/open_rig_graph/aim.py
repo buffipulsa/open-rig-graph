@@ -5,8 +5,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .constraints import AimConstraint
-from .transform import Transform, to_local_rotation
 from .entity import Entity
+from .transform import Transform, to_local_rotation
 
 
 def compute_aim_rotation(
