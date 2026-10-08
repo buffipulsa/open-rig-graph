@@ -1,4 +1,3 @@
-
 """Semantic entities used to describe a rig hierarchy."""
 
 from dataclasses import dataclass

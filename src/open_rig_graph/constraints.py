@@ -1,4 +1,3 @@
-
 """Semantic constraint definitions."""
 
 from dataclasses import dataclass
