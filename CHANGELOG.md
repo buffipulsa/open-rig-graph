@@ -22,6 +22,12 @@ All notable changes to OpenRigGraph are documented here.
 - Added NumPy-style API documentation for transform, aim, and constraint
   concepts.
 
+### Changed
+
+- Removed project-local copies of shared agent workflow, security, release,
+  and verification rules; `AGENTS.md` now retains only OpenRigGraph-specific
+  implementation constraints.
+
 ## [0.1.0] - 2026-09-22
 
 ### Added
